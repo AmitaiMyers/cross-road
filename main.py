@@ -13,6 +13,7 @@ from agent import DQNAgent
 WIDTH, HEIGHT = 1000, 1000  # Bigger window for bigger roads
 FPS = 60
 LANE_WIDTH = 40  # Slightly narrower lanes to fit 2 per side
+TURN_RADIUS = LANE_WIDTH * 0.75
 STOP_DIST = 40
 SECONDS_PER_SIM_HOUR = 10
 START_HOUR = 6
@@ -133,6 +134,17 @@ class Vehicle:
         self.turning_complete = False
         self._set_spawn_position()
 
+        # --- Left-turn arc animation state ---
+        self.is_turning = False
+        self.turn_theta = 0.0
+        self.turn_theta_end = 0.0
+        self.turn_center = (0.0, 0.0)
+        self.turn_radius = float(TURN_RADIUS)
+        self.turn_from_direction = self.direction
+        self.turn_to_direction = self.direction
+        self.turn_to_lane_index = self.lane_index
+
+
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect, border_radius=4)
 
@@ -241,44 +253,19 @@ class Vehicle:
         self.velocity += self.acceleration * 0.1
         self.velocity = max(0.0, min(self.velocity, self.max_speed))
 
-        cx, cy = WIDTH // 2, HEIGHT // 2
+        # If currently turning, keep following the turn arc
+        if self.is_turning:
+            self._advance_left_turn()
+            return
 
+        # Start a left turn only when we reached the turn trigger geometry
         if self.turn_intent == Turn.LEFT and not self.turning_complete:
-            should_turn = False
-            if self.direction == Direction.NORTH and self.pos_y <= cy + 5:
-                should_turn = True
-            elif self.direction == Direction.SOUTH and self.pos_y >= cy - 5:
-                should_turn = True
-            elif self.direction == Direction.EAST and self.pos_x >= cx - 5:
-                should_turn = True
-            elif self.direction == Direction.WEST and self.pos_x <= cx + 5:
-                should_turn = True
+            if self._should_begin_left_turn():
+                self._begin_left_turn()
+                return
 
-            if should_turn:
-                if self.direction in [Direction.NORTH, Direction.SOUTH]:
-                    self.pos_y = cy
-                else:
-                    self.pos_x = cx
-
-                if self.rect.width < self.rect.height:
-                    self.rect.size = (self.rect.height, self.rect.width)
-
-                if self.direction == Direction.NORTH:
-                    self.pos_x -= self.velocity
-                elif self.direction == Direction.SOUTH:
-                    self.pos_x += self.velocity
-                elif self.direction == Direction.EAST:
-                    self.pos_y -= self.velocity
-                elif self.direction == Direction.WEST:
-                    self.pos_y += self.velocity
-
-                if abs(self.pos_x - cx) > 60 or abs(self.pos_y - cy) > 60:
-                    self.turning_complete = True
-            else:
-                self._move_forward()
-        else:
-            self._move_forward()
-
+        # Otherwise, normal forward movement
+        self._move_forward()
         self.rect.x = int(self.pos_x)
         self.rect.y = int(self.pos_y)
 
@@ -291,6 +278,182 @@ class Vehicle:
             self.pos_x += self.velocity
         elif self.direction == Direction.WEST:
             self.pos_x -= self.velocity
+
+    def _set_rect_orientation(self, direction: Direction) -> None:
+        center = self.rect.center
+        if direction in [Direction.NORTH, Direction.SOUTH]:
+            self.rect.size = (25, 45)
+        else:
+            self.rect.size = (45, 25)
+        self.rect.center = center
+        self.pos_x = float(self.rect.x)
+        self.pos_y = float(self.rect.y)
+
+    def _get_center_float(self) -> tuple[float, float]:
+        return (self.pos_x + self.rect.width / 2.0, self.pos_y + self.rect.height / 2.0)
+
+    def _set_center_float(self, x: float, y: float) -> None:
+        self.rect.center = (int(x), int(y))
+        self.pos_x = float(self.rect.x)
+        self.pos_y = float(self.rect.y)
+
+    def _left_turn_destination(self) -> tuple[Direction, int]:
+        # Left turn mapping:
+        # NORTH(up) -> WEST(left)
+        # SOUTH(down) -> EAST(right)
+        # EAST(right) -> NORTH(up)
+        # WEST(left) -> SOUTH(down)
+        if self.direction == Direction.NORTH:
+            to_dir = Direction.WEST
+        elif self.direction == Direction.SOUTH:
+            to_dir = Direction.EAST
+        elif self.direction == Direction.EAST:
+            to_dir = Direction.NORTH
+        else:
+            to_dir = Direction.SOUTH
+
+        # Destination "straight" lane index is always even: dir.value * 2
+        to_lane_index = to_dir.value * 2
+        return to_dir, to_lane_index
+
+    def _should_begin_left_turn(self) -> bool:
+        # Trigger point based on lane geometry so the arc lands exactly in the destination straight lane.
+        cx, cy = WIDTH // 2, HEIGHT // 2
+        offset_left = LANE_WIDTH * 0.5
+        offset_straight = LANE_WIDTH * 1.5
+        r = float(TURN_RADIUS)
+
+        center_x, center_y = self._get_center_float()
+
+        if self.direction == Direction.NORTH:
+            # Approach x is right of centerline
+            x_lane = cx + offset_left
+            y_dest = cy - offset_straight  # Westbound straight lane (y above centerline)
+            y_turn_start = y_dest - r
+            return center_y <= y_turn_start and abs(center_x - x_lane) < LANE_WIDTH
+
+        if self.direction == Direction.SOUTH:
+            x_lane = cx - offset_left
+            y_dest = cy + offset_straight  # Eastbound straight lane (y below centerline)
+            y_turn_start = y_dest + r
+            return center_y >= y_turn_start and abs(center_x - x_lane) < LANE_WIDTH
+
+        if self.direction == Direction.EAST:
+            y_lane = cy + offset_left
+            x_dest = cx + offset_straight  # Northbound straight lane (x right of centerline)
+            x_turn_start = x_dest + r
+            return center_x >= x_turn_start and abs(center_y - y_lane) < LANE_WIDTH
+
+        # WEST
+        y_lane = cy - offset_left
+        x_dest = cx - offset_straight  # Southbound straight lane (x left of centerline)
+        x_turn_start = x_dest - r
+        return center_x <= x_turn_start and abs(center_y - y_lane) < LANE_WIDTH
+
+    def _begin_left_turn(self) -> None:
+        cx, cy = WIDTH // 2, HEIGHT // 2
+        offset_left = LANE_WIDTH * 0.5
+        offset_straight = LANE_WIDTH * 1.5
+        r = float(TURN_RADIUS)
+
+        self.turn_from_direction = self.direction
+        self.turn_to_direction, self.turn_to_lane_index = self._left_turn_destination()
+
+        # Arc parameters are chosen so:
+        # - start tangent matches approach direction
+        # - end tangent matches destination direction
+        # - end point lands on destination straight lane centerline
+
+        if self.direction == Direction.NORTH:
+            x_lane = cx + offset_left
+            y_dest = cy - offset_straight
+            center = (x_lane + r, y_dest - r)
+            theta_start = math.pi
+            theta_end = math.pi / 2.0
+
+        elif self.direction == Direction.SOUTH:
+            x_lane = cx - offset_left
+            y_dest = cy + offset_straight
+            center = (x_lane - r, y_dest + r)
+            theta_start = 0.0
+            theta_end = -math.pi / 2.0
+
+        elif self.direction == Direction.EAST:
+            y_lane = cy + offset_left
+            x_dest = cx + offset_straight
+            center = (x_dest + r, y_lane + r)
+            theta_start = -math.pi / 2.0
+            theta_end = -math.pi
+
+        else:  # WEST
+            y_lane = cy - offset_left
+            x_dest = cx - offset_straight
+            center = (x_dest - r, y_lane - r)
+            theta_start = math.pi / 2.0
+            theta_end = 0.0
+
+        self.turn_center = (float(center[0]), float(center[1]))
+        self.turn_radius = r
+        self.turn_theta = float(theta_start)
+        self.turn_theta_end = float(theta_end)
+        self.is_turning = True
+
+        # Snap to exact start point of the arc for clean visuals
+        start_x = self.turn_center[0] + self.turn_radius * math.cos(self.turn_theta)
+        start_y = self.turn_center[1] + self.turn_radius * math.sin(self.turn_theta)
+        self._set_center_float(start_x, start_y)
+
+    def _advance_left_turn(self) -> None:
+        # Move along the arc with angular step proportional to speed (arc-length ~= velocity per tick)
+        # dtheta = v / r
+        if self.turn_radius <= 0.0:
+            return
+
+        step = float(self.velocity) / float(self.turn_radius)
+        if step <= 0.0:
+            return
+
+        # Direction of theta movement
+        sign = 1.0 if self.turn_theta_end > self.turn_theta else -1.0
+        next_theta = self.turn_theta + sign * step
+
+        # Clamp to end
+        if sign > 0.0 and next_theta > self.turn_theta_end:
+            next_theta = self.turn_theta_end
+        if sign < 0.0 and next_theta < self.turn_theta_end:
+            next_theta = self.turn_theta_end
+
+        self.turn_theta = next_theta
+
+        x = self.turn_center[0] + self.turn_radius * math.cos(self.turn_theta)
+        y = self.turn_center[1] + self.turn_radius * math.sin(self.turn_theta)
+        self._set_center_float(x, y)
+
+        # Swap orientation halfway through the turn (best possible with axis-aligned Rect)
+        total = abs(self.turn_theta_end - (self.turn_theta_end - (self.turn_theta_end - self.turn_theta)))  # no-op; kept explicit
+        # Use normalized progress by comparing remaining distance
+        denom = abs(self.turn_theta_end - self.turn_theta) + abs(self.turn_theta - self.turn_theta_end)
+        # simpler: based on theta interpolation fraction
+        # We'll compute using start/end snapshot:
+        # (store start in local not possible) => approximate with midpoint check:
+        mid = (self.turn_theta_end + (self.turn_theta_end - (self.turn_theta_end - self.turn_theta_end)))  # no-op
+        # Instead: swap when close to half arc: use angle proximity to average.
+        avg = (self.turn_theta_end + self.turn_theta) / 2.0
+
+        # Practical: if direction changes axis, swap once we're closer to end than start
+        if abs(self.turn_theta_end - self.turn_theta) < abs(self.turn_theta - (self.turn_theta_end + (self.turn_theta_end - self.turn_theta_end))):
+            self._set_rect_orientation(self.turn_to_direction)
+        else:
+            self._set_rect_orientation(self.turn_from_direction)
+
+        if self.turn_theta == self.turn_theta_end:
+            # Finish: lock to destination lane + behavior
+            self.is_turning = False
+            self.turning_complete = True
+            self.direction = self.turn_to_direction
+            self.turn_intent = Turn.STRAIGHT
+            self.lane_index = self.turn_to_lane_index
+            self._set_rect_orientation(self.direction)
 
 
 class TrafficLight:
