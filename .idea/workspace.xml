@@ -4,9 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ac97ccb6-b40b-4ce5-b80a-03cb9b574d53" name="Changes" comment=" Done phase 2">
+    <list default="true" id="ac97ccb6-b40b-4ce5-b80a-03cb9b574d53" name="Changes" comment="turn left animation">
+      <change afterPath="$PROJECT_DIR$/model/traffic_best_phase3.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/configuration.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pid_controller.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/simulation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/structs_enum.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/traffic_light.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vehicle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/traffic_best_phase3.pth" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,9 +32,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="377Hj43qE3D5n2ugEeylqS26bji" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -34,13 +43,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\97252\Dropbox\My PC (LAPTOP-TDNMCL9M)\Desktop\Projects\traffic\model" />
+      <recent name="C:\Users\97252\Dropbox\My PC (LAPTOP-TDNMCL9M)\Desktop\Projects\traffic\src" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="traffic" />
@@ -55,7 +70,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\97252\Dropbox\My PC (LAPTOP-TDNMCL9M)\Desktop\Projects\traffic\src\main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -102,12 +117,21 @@
       <option name="project" value="LOCAL" />
       <updated>1766697726862</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="turn left animation">
+      <option name="closed" value="true" />
+      <created>1766698190666</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1766698190666</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first commit - Done phase 1" />
     <MESSAGE value=" Done phase 2" />
-    <option name="LAST_COMMIT_MESSAGE" value=" Done phase 2" />
+    <MESSAGE value="turn left animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="turn left animation" />
   </component>
 </project>
