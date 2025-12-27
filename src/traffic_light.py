@@ -1,5 +1,8 @@
 import pygame
 
+from src.configuration import HEIGHT, LANE_WIDTH, WIDTH, DARK_GRAY, RED, YELLOW, GREEN
+from src.structs_enum import LightState
+
 
 class TrafficLight:
     def __init__(self, lane_id):

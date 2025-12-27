@@ -3,7 +3,9 @@ import random
 
 import pygame
 
-from src.main import Turn, WIDTH, HEIGHT, LANE_WIDTH, TURN_RADIUS, Direction, PIDController, LightState, STOP_DIST
+from src.configuration import TURN_RADIUS, HEIGHT, WIDTH, LANE_WIDTH, STOP_DIST
+from src.pid_controller import PIDController
+from src.structs_enum import Direction, Turn, LightState
 
 
 class Vehicle:

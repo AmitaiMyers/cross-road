@@ -1,3 +1,16 @@
+import random
+import sys
+
+import numpy as np
+import pygame
+
+from src.agent import DQNAgent
+from src.configuration import WIDTH, HEIGHT, HOURLY_TRAFFIC, SPAWN_LANE_INDICES, DEFAULT_RATE, START_HOUR, \
+    SECONDS_PER_SIM_HOUR, WHITE, LANE_WIDTH, GRAY, YELLOW, FPS, BLACK
+from src.structs_enum import LightState
+from src.traffic_light import TrafficLight
+from src.vehicle import Vehicle
+
 
 class Simulation:
     def __init__(self):
