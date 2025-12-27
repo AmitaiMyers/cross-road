@@ -4,7 +4,7 @@ from src.simulation import Simulation
 
 if __name__ == "__main__":
     sim = Simulation()
-    brain_file = "../model/traffic_best_phase3.pth"
+    brain_file = "traffic_best_phase3.pth"
 
     if os.path.exists(brain_file):
         print(f"Found brain file: {brain_file}")

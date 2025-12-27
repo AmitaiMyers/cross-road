@@ -5,17 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ac97ccb6-b40b-4ce5-b80a-03cb9b574d53" name="Changes" comment="turn left animation">
-      <change afterPath="$PROJECT_DIR$/model/traffic_best_phase3.pth" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/configuration.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pid_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/simulation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/structs_enum.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/traffic_light.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/vehicle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/traffic_best_phase3.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/traffic_best_phase3.pth" beforeDir="false" afterPath="$PROJECT_DIR$/traffic_best_phase3.pth" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/configuration.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/configuration.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
